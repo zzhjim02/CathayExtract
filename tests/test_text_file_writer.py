@@ -28,7 +28,7 @@ class TestTextFileWriter:
         output_path = writer.write(relative_path, extracted_text)
 
         assert output_path.exists()
-        assert output_path.name == "test.txt"
+        assert output_path.name == "test_result.txt"
         assert output_path.read_text(encoding="utf-8") == "测试文本内容"
 
     def test_write_with_subdirectory(self, temp_dir):
