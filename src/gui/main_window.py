@@ -37,7 +37,7 @@ from .method_selector_widget import MethodSelectorWidget
 from .performance_stats_widget import PerformanceStatsWidget
 
 APP_TITLE = "CathayExtract · PDF OCR 文本提取器"
-APP_VERSION = "v1.2.2"
+APP_VERSION = "v1.2.3"
 
 
 class PendingListWidget(QListWidget):
@@ -173,12 +173,12 @@ class MainWindow(QMainWindow):
         self.name_mode_combo.addItem("统一 原名_result.txt", "result")
         self.name_mode_combo.addItem("与源文件名完全同名", "same")
         self.name_mode_combo.setToolTip(
-            "自动判定规则（与 Cathay 工具链一致）：\n"
-            "  X_layered.pdf        → X_result.txt\n"
-            "  X_PD6AIFOCR_opt.pdf  → X_PD6AIFOCR.txt（_opt 丢掉）\n"
-            "  X_PD6AIFOCR.pdf      → X_PD6AIFOCR.txt（同名同后缀，_FOCR/_OCR 同理）\n"
-            "  X.pdf（无后缀）       → X_result.txt\n"
-            "  8 位编号 / _全1册 / _unlocked 等噪声不保留"
+            "自动判定规则（只动末尾后缀，文件名前面的一切原样保留）：\n"
+            "  X_layered.pdf          → X_result.txt（固定配对）\n"
+            "  X_PD6AIFOCR_opt.pdf    → X_PD6AIFOCR.txt（_opt 只在 PDF 上，TXT 里丢掉）\n"
+            "  X_PD6AIFOCR.pdf        → X_PD6AIFOCR.txt（同名同后缀；_FOCR / _OCR / _PD5AIOCR / _PDVL6AIOCR 等同理）\n"
+            "  X_全1册_PD6AIFOCR.pdf   → X_全1册_PD6AIFOCR.txt（_全1册 / 8 位编号 / _unlocked / 扫描版 都保留）\n"
+            "  X.pdf（无后缀）         → X_result.txt"
         )
         _saved_mode = load_settings().get("out_name_mode", "auto")
         _idx = self.name_mode_combo.findData(_saved_mode)
