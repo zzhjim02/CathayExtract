@@ -76,11 +76,18 @@ class TestOutputNaming:
         # 固定配对：_layered.pdf ↔ _result.txt
         ("甲书_layered.pdf", "甲书_result.txt"),
         ("甲书_Layered.pdf", "甲书_result.txt"),
-        # _opt 丢掉
+        # _opt 丢掉（任何后缀后面都能跟 _opt）
         ("甲书_PD6AIFOCR_opt.pdf", "甲书_PD6AIFOCR.txt"),
+        ("甲书_PD6AIOCR_opt.pdf", "甲书_PD6AIOCR.txt"),
+        ("甲书_PDVL6AIFOCR_opt.pdf", "甲书_PDVL6AIFOCR.txt"),
+        ("甲书_AIOCR_opt.pdf", "甲书_AIOCR.txt"),
+        ("甲书_OCR_opt.pdf", "甲书_OCR.txt"),
         ("甲书_FOCR_opt.pdf", "甲书_FOCR.txt"),
+        ("甲书_layered_opt.pdf", "甲书_result.txt"),
+        ("甲书_PD6AIFOCR_opt_【繁转简】.pdf", "甲书_PD6AIFOCR_【繁转简】.txt"),
         # 同名同后缀
         ("甲书_PD6AIFOCR.pdf", "甲书_PD6AIFOCR.txt"),
+        ("甲书_PD6AIOCR.pdf", "甲书_PD6AIOCR.txt"),
         ("甲书_PD6AIOCR.pdf", "甲书_PD6AIOCR.txt"),
         ("甲书_PD5AIFOCR.pdf", "甲书_PD5AIFOCR.txt"),
         ("甲书_PD7AIOCR.pdf", "甲书_PD7AIOCR.txt"),
