@@ -17,18 +17,25 @@ class OutputWriterRouter:
     """决定 TXT 写到哪里
 
     - 配了输出目录：统一写到该目录（保持相对目录结构）
-    - 输出目录留空：写到每个源 PDF 旁边（原地输出），文件名 = 原文件名.txt
+    - 输出目录留空：写到每个源 PDF 旁边（原地输出）
+
+    输出文件名由 ``config.out_name_mode`` 决定（默认 auto，见 core.output_naming）：
+    源名末尾有标准后缀 → 同名同后缀（``_layered``→``_result``、``_opt`` 丢掉）；没有 → ``原名_result.txt``。
     """
 
     def __init__(self, config: ExtractorConfig):
         self.config = config
         self.in_place = config.output_dir is None
-        self._shared = None if self.in_place else TextFileWriter(config.output_dir, config.overwrite)
+        self.name_mode = getattr(config, "out_name_mode", "auto")
+        self._shared = (None if self.in_place
+                        else TextFileWriter(config.output_dir, config.overwrite,
+                                            name_mode=self.name_mode))
 
     def writer_for(self, pdf_info) -> TextFileWriter:
         """取该文件使用的写入器"""
         if self.in_place:
-            return TextFileWriter(pdf_info.file_path.parent, self.config.overwrite)
+            return TextFileWriter(pdf_info.file_path.parent, self.config.overwrite,
+                                  name_mode=self.name_mode)
         return self._shared
 
     def relative_for(self, pdf_info) -> Path:
