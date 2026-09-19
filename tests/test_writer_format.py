@@ -94,11 +94,15 @@ class TestOutputNaming:
         ("甲书_PD6AIFOCR_【繁转简】.pdf", "甲书_PD6AIFOCR_【繁转简】.txt"),
         ("甲书_layered_【繁转简】.pdf", "甲书_result_【繁转简】.txt"),
         ("甲书_PD6AIFOCR【简转繁】.pdf", "甲书_PD6AIFOCR【简转繁】.txt"),
-        # 8 位编号 / _全1册 / _unlocked 等噪声不保留
-        ("甲书_10117362_PD6AIOCR.pdf", "甲书_PD6AIOCR.txt"),
-        ("甲书_全1册_PD6AIFOCR.pdf", "甲书_PD6AIFOCR.txt"),
-        ("甲书_unlocked_PD6AIOCR.pdf", "甲书_PD6AIOCR.txt"),
-        ("甲书 12564425 F_ORPALIS优化.pdf", "甲书_result.txt"),
+        # 8 位编号 / _全1册 / _unlocked / 扫描版 等不是后缀（是文件名的一部分）→ 原样保留
+        ("甲书_10117362_PD6AIOCR.pdf", "甲书_10117362_PD6AIOCR.txt"),
+        ("甲书_全1册_PD6AIFOCR.pdf", "甲书_全1册_PD6AIFOCR.txt"),
+        ("甲书_unlocked_PD6AIOCR.pdf", "甲书_unlocked_PD6AIOCR.txt"),
+        ("甲书 12564425 F_ORPALIS优化_PD6AIOCR.pdf", "甲书 12564425 F_ORPALIS优化_PD6AIOCR.txt"),
+        ("26 古文献学四讲.黄永年.清晰扫描版_PD6AIOCR.pdf",
+         "26 古文献学四讲.黄永年.清晰扫描版_PD6AIOCR.txt"),
+        ("中华大典 农业典 茶业分典 上_全1册_PD6AIFOCR.pdf",
+         "中华大典 农业典 茶业分典 上_全1册_PD6AIFOCR.txt"),
         # 无标准后缀 → _result
         ("甲书.pdf", "甲书_result.txt"),
         ("中华大典 民俗典 风俗民俗分典 2.pdf", "中华大典 民俗典 风俗民俗分典 2_result.txt"),
