@@ -175,8 +175,9 @@ class MainWindow(QMainWindow):
         self.name_mode_combo.setToolTip(
             "自动判定规则（只动末尾后缀，文件名前面的一切原样保留）：\n"
             "  X_layered.pdf          → X_result.txt（固定配对）\n"
-            "  X_PD6AIFOCR_opt.pdf    → X_PD6AIFOCR.txt（_opt 只在 PDF 上，TXT 里丢掉）\n"
-            "  X_PD6AIFOCR.pdf        → X_PD6AIFOCR.txt（同名同后缀；_FOCR / _OCR / _PD5AIOCR / _PDVL6AIOCR 等同理）\n"
+            "  X_PD6AIFOCR.pdf        → X_PD6AIFOCR.txt（同名同后缀）\n"
+            "  X_PD6AIOCR.pdf         → X_PD6AIOCR.txt（同名同后缀；PD5/PD6/PD7/PDVL6 × AIOCR/AIFOCR、_FOCR / _OCR 全都同理）\n"
+            "  X_<后缀>_opt.pdf       → X_<后缀>.txt（任何后缀后面都能再跟 _opt，_opt 一律丢掉）\n"
             "  X_全1册_PD6AIFOCR.pdf   → X_全1册_PD6AIFOCR.txt（_全1册 / 8 位编号 / _unlocked / 扫描版 都保留）\n"
             "  X.pdf（无后缀）         → X_result.txt"
         )
