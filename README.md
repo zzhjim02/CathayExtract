@@ -92,8 +92,8 @@ TXT 默认就写在原 PDF 旁边，名字**沿用源文件的后缀**（`书_PD
 | 源 PDF 名 | 导出的 TXT |
 |:----|:----|
 | `X_layered.pdf` | `X_result.txt`（固定配对：`_layered.pdf ↔ _result.txt`） |
-| `X_PD6AIFOCR_opt.pdf` | `X_PD6AIFOCR.txt`（`_opt` 丢掉） |
-| `X_PD6AIFOCR.pdf`（版本段 `PD5` / `PD6` / `PD7` / `PDVL6` × 繁简 `AIFOCR` / `AIOCR` 的**所有组合**，如 `_PD5AIOCR`、`_PD5AIFOCR`、`_PDVL6AIOCR`、`_PDVL6AIFOCR`、`_PD7AIOCR`、`_PD7AIFOCR`；以及无版本 `_AIFOCR` / `_AIOCR` / `_FOCR` / `_OCR`） | `X_PD6AIFOCR.txt`（**同名同后缀**） |
+| `X_PD6AIFOCR.pdf`、`X_PD6AIOCR.pdf`（版本段 `PD5` / `PD6` / `PD7` / `PDVL6` × 繁简 `AIFOCR` / `AIOCR` 的**所有组合**，如 `_PD6AIOCR`、`_PD5AIOCR`、`_PD5AIFOCR`、`_PDVL6AIOCR`、`_PDVL6AIFOCR`、`_PD7AIOCR`、`_PD7AIFOCR`；以及无版本 `_AIFOCR` / `_AIOCR` / `_FOCR` / `_OCR`） | `X_PD6AIFOCR.txt` / `X_PD6AIOCR.txt`（**同名同后缀**） |
+| `X_<任意后缀>_opt.pdf`（**任何标准后缀后面都能再跟 `_opt`**：`X_PD6AIOCR_opt.pdf`、`X_PD6AIFOCR_opt.pdf`、`X_FOCR_opt.pdf`、`X_OCR_opt.pdf`、`X_PDVL6AIFOCR_opt.pdf`、`X_layered_opt.pdf` …） | `X_PD6AIOCR.txt` 等（**`_opt` 一律丢掉**；`_layered_opt.pdf → _result.txt`） |
 | `X_全1册_PD6AIFOCR.pdf`、`X_10117362_PD6AIOCR.pdf`、`X_..._unlocked_PD6AIOCR.pdf` | **原样保留**（`_全1册`、8 位编号、`_unlocked`、`扫描版` 这些**不是后缀**，是文件名的一部分）：`X_全1册_PD6AIFOCR.txt` 等 |
 | `X_PD6AIFOCR_【繁转简】.pdf` | `X_PD6AIFOCR_【繁转简】.txt`（**PDF 一般不带这个尾巴**，它是 TXT 侧的后缀；真带了则原样保留） |
 | `X.pdf`（没有任何标准后缀） | `X_result.txt` |
