@@ -3,7 +3,7 @@ import os
 import sys
 
 APP_TITLE = 'CathayExtract · PDF OCR 文本提取器'
-APP_VERSION = 'v1.2.1'
+APP_VERSION = 'v1.2.2'
 
 
 def app_dir():
@@ -54,7 +54,32 @@ def selftest():
         out.append('主窗口=OK 标题=%s' % w.windowTitle())
         w.close()
 
-        # 新增能力自检：原地输出（输出到原目录、原文件名.txt）+ CathayOCR 格式
+        # 新增能力自检：输出命名规则（与 Cathay 工具链后缀约定一致）
+        try:
+            from src.core.output_naming import txt_name_for_pdf
+            cases = [
+                ('甲书_layered.pdf', '甲书_result.txt'),
+                ('甲书_layered_【繁转简】.pdf', '甲书_result_【繁转简】.txt'),
+                ('甲书_PD6AIFOCR_opt.pdf', '甲书_PD6AIFOCR.txt'),
+                ('甲书_PD6AIFOCR.pdf', '甲书_PD6AIFOCR.txt'),
+                ('甲书_PD6AIOCR.pdf', '甲书_PD6AIOCR.txt'),
+                ('甲书_FOCR.pdf', '甲书_FOCR.txt'),
+                ('甲书_OCR.pdf', '甲书_OCR.txt'),
+                ('甲书_PD5AIFOCR.pdf', '甲书_PD5AIFOCR.txt'),
+                ('甲书_PDVL6AIFOCR.pdf', '甲书_PDVL6AIFOCR.txt'),
+                ('甲书_result.pdf', '甲书_result.txt'),
+                ('甲书_10117362_PD6AIOCR.pdf', '甲书_PD6AIOCR.txt'),
+                ('甲书_全1册_PD6AIFOCR.pdf', '甲书_PD6AIFOCR.txt'),
+                ('甲书_unlocked_PD6AIOCR.pdf', '甲书_PD6AIOCR.txt'),
+                ('甲书.pdf', '甲书_result.txt'),
+            ]
+            bad = [(a, b, txt_name_for_pdf(a)) for a, b in cases if txt_name_for_pdf(a) != b]
+            out.append('命名规则=%s（%d/%d）' % ('OK' if not bad else 'FAIL %r' % bad,
+                                              len(cases) - len(bad), len(cases)))
+        except Exception as e:
+            out.append('命名规则=FAIL %s: %s' % (type(e).__name__, e))
+
+        # 新增能力自检：原地输出（输出到原目录）+ CathayOCR 格式
         try:
             import tempfile
             import fitz
@@ -74,7 +99,7 @@ def selftest():
                                   skip_existing=True, use_multithreading=False,
                                   file_list=[pdf])
             TaskCoordinator(cfg).run()
-            txt = d / '自检样张.txt'
+            txt = d / '自检样张_result.txt'
             content = txt.read_text(encoding='utf-8') if txt.exists() else ''
             out.append('原地输出=%s (文件名=%s)' % (txt.exists(), txt.name))
             out.append('输出格式=(头=%s 分页=%s)' % (
