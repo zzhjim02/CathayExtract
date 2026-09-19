@@ -3,7 +3,7 @@ import os
 import sys
 
 APP_TITLE = 'CathayExtract · PDF OCR 文本提取器'
-APP_VERSION = 'v1.2.2'
+APP_VERSION = 'v1.2.3'
 
 
 def app_dir():
@@ -65,12 +65,16 @@ def selftest():
                 ('甲书_PD6AIOCR.pdf', '甲书_PD6AIOCR.txt'),
                 ('甲书_FOCR.pdf', '甲书_FOCR.txt'),
                 ('甲书_OCR.pdf', '甲书_OCR.txt'),
+                ('甲书_PD5AIOCR.pdf', '甲书_PD5AIOCR.txt'),
                 ('甲书_PD5AIFOCR.pdf', '甲书_PD5AIFOCR.txt'),
+                ('甲书_PD7AIFOCR.pdf', '甲书_PD7AIFOCR.txt'),
+                ('甲书_PDVL6AIOCR.pdf', '甲书_PDVL6AIOCR.txt'),
                 ('甲书_PDVL6AIFOCR.pdf', '甲书_PDVL6AIFOCR.txt'),
                 ('甲书_result.pdf', '甲书_result.txt'),
-                ('甲书_10117362_PD6AIOCR.pdf', '甲书_PD6AIOCR.txt'),
-                ('甲书_全1册_PD6AIFOCR.pdf', '甲书_PD6AIFOCR.txt'),
-                ('甲书_unlocked_PD6AIOCR.pdf', '甲书_PD6AIOCR.txt'),
+                ('甲书_10117362_PD6AIOCR.pdf', '甲书_10117362_PD6AIOCR.txt'),
+                ('甲书_全1册_PD6AIFOCR.pdf', '甲书_全1册_PD6AIFOCR.txt'),
+                ('甲书_扫描版_unlocked_PD6AIOCR.pdf', '甲书_扫描版_unlocked_PD6AIOCR.txt'),
+                ('甲书_PD6AIFOCR_【繁转简】.pdf', '甲书_PD6AIFOCR_【繁转简】.txt'),
                 ('甲书.pdf', '甲书_result.txt'),
             ]
             bad = [(a, b, txt_name_for_pdf(a)) for a, b in cases if txt_name_for_pdf(a) != b]
