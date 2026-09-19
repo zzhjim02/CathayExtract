@@ -15,7 +15,7 @@
 
 不必重跑 OCR，也不必安装 Python：**把文件或文件夹拖进窗口**，点一下「开始提取」就行——
 TXT 默认就写在原 PDF 旁边，名字**沿用源文件的后缀**（`书_PD6AIFOCR.pdf → 书_PD6AIFOCR.txt`，
-`书_layered.pdf → 书_result.txt`，没有后缀则 `书_result.txt`）。
+`书_layered.pdf → 书_result.txt`，没有后缀则 `书_result.txt`）——**只动末尾那一段后缀，文件名前面的一切原样保留**。
 
 </div>
 
@@ -32,7 +32,7 @@ TXT 默认就写在原 PDF 旁边，名字**沿用源文件的后缀**（`书_PD
 | ③ | [**CathaySimplify** →](https://github.com/zzhjim02/CathaySimplify) | 🔄 TXT 繁简体批量双向转换 · 编码智能适配 | ✅ v1.0.0 |
 | ④ | [**CathayShelf** →](https://github.com/zzhjim02/CathayShelf) | 🗂️ 图书著录建夹 · 后缀替换 · 繁简转换+编码规范化 | ✅ v0.4.3 |
 | ⑤ | [**CathayReader** →](https://github.com/zzhjim02/CathayReader) | 📖 PDF/TXT 双栏同步古籍校勘阅读器 | ✅ v1.0.0 |
-| ✳ | **⭐ CathayExtract（你在这里）** | 🔎 **已有双层 PDF → 提取文字层成 TXT** | 🆕 **v1.2.2** |
+| ✳ | **⭐ CathayExtract（你在这里）** | 🔎 **已有双层 PDF → 提取文字层成 TXT** | 🆕 **v1.2.3** |
 
 </div>
 
@@ -94,10 +94,11 @@ TXT 默认就写在原 PDF 旁边，名字**沿用源文件的后缀**（`书_PD
 | `X_layered.pdf` | `X_result.txt`（固定配对：`_layered.pdf ↔ _result.txt`） |
 | `X_PD6AIFOCR_opt.pdf` | `X_PD6AIFOCR.txt`（`_opt` 丢掉） |
 | `X_PD6AIFOCR.pdf`（版本段 `PD5` / `PD6` / `PD7` / `PDVL6` × 繁简 `AIFOCR` / `AIOCR` 的**所有组合**，如 `_PD5AIOCR`、`_PD5AIFOCR`、`_PDVL6AIOCR`、`_PDVL6AIFOCR`、`_PD7AIOCR`、`_PD7AIFOCR`；以及无版本 `_AIFOCR` / `_AIOCR` / `_FOCR` / `_OCR`） | `X_PD6AIFOCR.txt`（**同名同后缀**） |
-| `X_全1册_PD6AIFOCR.pdf`、`X_10117362_PD6AIOCR.pdf`、`X_..._unlocked_PD6AIOCR.pdf` | 噪声不保留（8 位编号 / `_全1册` / `_unlocked` / `扫描版` 等）：`X_PD6AIFOCR.txt` |
+| `X_全1册_PD6AIFOCR.pdf`、`X_10117362_PD6AIOCR.pdf`、`X_..._unlocked_PD6AIOCR.pdf` | **原样保留**（`_全1册`、8 位编号、`_unlocked`、`扫描版` 这些**不是后缀**，是文件名的一部分）：`X_全1册_PD6AIFOCR.txt` 等 |
 | `X_PD6AIFOCR_【繁转简】.pdf` | `X_PD6AIFOCR_【繁转简】.txt`（**PDF 一般不带这个尾巴**，它是 TXT 侧的后缀；真带了则原样保留） |
 | `X.pdf`（没有任何标准后缀） | `X_result.txt` |
 
+  > 规则一句话：**只替换/补末尾的那一段后缀，其余一字不改**（`_opt` 是例外——它属于 PDF 侧，TXT 里丢掉）。
   > 这样导出的 TXT 与 [CathayOCR](https://github.com/zzhjim02/CathayOCR) / [CathayShelf](https://github.com/zzhjim02/CathayShelf) / [CathayRestore](https://github.com/zzhjim02/CathayRestore) 的后缀约定完全一致，**不用再转换**就能被工具链直接识别。
 - **输出目录留空 = 原地输出**：TXT 直接写在每个 PDF 所在目录；指定了输出目录则目录结构照搬（`A/B/书.pdf → 输出根/A/B/书_PD6AIFOCR.txt`）
 - **输出格式与 [CathayOCR Pro](https://github.com/zzhjim02/CathayOCR) 默认导出一致**：
@@ -128,7 +129,7 @@ OCR文本提取结果
 | 下载方式 | 链接 |
 |:-------|:-----|
 | 📥 **百度网盘**（密码 2026） | <待填：百度网盘分享链接> |
-| 🐙 **GitHub Releases** | [CathayExtract v1.2.2](https://github.com/zzhjim02/CathayExtract/releases/tag/v1.2.2)（Assets 里直接下 `CathayExtract.exe`） |
+| 🐙 **GitHub Releases** | [CathayExtract v1.2.3](https://github.com/zzhjim02/CathayExtract/releases/tag/v1.2.3)（Assets 里直接下 `CathayExtract.exe`） |
 | 🧰 **便携版（本仓库源码 + runtime）** | 解压后双击 `启动.bat`（自带 `runtime\`） |
 
 ## 🖥️ 系统要求
@@ -210,7 +211,8 @@ CathayExtract-DEV\
 
 ## 📝 更新日志
 
-- **v1.2.2**：**TXT 命名改为「按源文件名后缀自动判定」**——末尾有标准后缀（`_layered` / `_result` / `_PD6AIFOCR` / `_PD6AIOCR` / `_PD5AIFOCR` / `_PDVL6AIFOCR` / `_AIFOCR` / `_FOCR` / `_OCR` …）就**同名同后缀**导出（`_layered.pdf → _result.txt`、`_opt` 丢掉），没有后缀则导出 `书名_result.txt`；文件名里的噪声（8 位编号 / `_全1册` / `_unlocked` / `扫描版` 等）不再保留；繁简尾巴 `_【繁转简】` 原样保留。界面新增「**TXT 命名**」下拉（自动 / 统一 `_result` / 与源文件同名），选择会被记住
+- **v1.2.3**：**修正命名规则**——只替换/补**末尾那一段后缀**，文件名前面的一切（`_全1册`、8 位编号、`_unlocked`、`扫描版` 等）**原样保留**；`_opt` 属 PDF 侧后缀，TXT 里丢掉（`X_PD6AIFOCR_opt.pdf → X_PD6AIFOCR.txt`）；`_layered.pdf → _result.txt` 固定配对；繁简尾巴 `_【繁转简】` 原样保留；没有标准后缀才补 `_result`。自检覆盖 18 条命名用例，单元测试 51 项全过
+- **v1.2.2**：TXT 命名改为**按源文件名后缀自动判定**（`_layered.pdf → _result.txt`、`_opt` 丢掉、同名同后缀、无后缀补 `_result`）；界面新增「**TXT 命名**」下拉（自动 / 统一 `_result` / 与源文件同名），选择会被记住
 - **v1.2.1**：**支持拖入文件与文件夹**；新增**待处理列表**（可单独移除某个文件）；**输出目录默认留空 = 输出到原目录**；**导出格式对齐 CathayOCR Pro**（抬头 + `第 N 页` 分页）；不覆盖已存在的 TXT 时**自动跳过**；自检新增「原地输出 + 格式」检查
 - **v1.2.0**：加入提取方法选择与性能统计、自动降级；更名 **CathayExtract** 并入 Cathay 工具链，许可由 MIT 调整为 **GPL-3.0**；加入便携运行时与 `启动.bat`、图标、`--selftest` 自检
 - **v1.1.0**：多线程并行、智能跳过已处理文件、UI 调整
