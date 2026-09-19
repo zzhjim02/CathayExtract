@@ -113,6 +113,7 @@ class ExtractorConfig:
     enable_performance_stats: bool = True  # 是否启用性能统计
     fallback_on_failure: bool = True  # 失败时是否自动降级
     file_list: Optional[List[Path]] = None  # 显式待处理清单(拖入的文件/预扫描结果);为空则按源目录扫描
+    out_name_mode: str = "auto"  # 输出 TXT 命名：auto=按源文件名后缀自动判定（默认）/ result=统一 书名_result.txt / same=与源文件同名
 
     def __post_init__(self):
         """验证配置参数"""
@@ -127,6 +128,8 @@ class ExtractorConfig:
             self.file_list = [Path(p) for p in self.file_list]
         else:
             self.file_list = None
+        if self.out_name_mode not in ("auto", "result", "same"):
+            self.out_name_mode = "auto"
 
     @property
     def in_place(self) -> bool:
