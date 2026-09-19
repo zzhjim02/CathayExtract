@@ -9,8 +9,8 @@
 源 PDF 名                                      导出的 TXT
 ============  ==========================================================
 ``X_layered.pdf``                              ``X_result.txt``（固定配对）
-``X_PD6AIFOCR.pdf``                            ``X_PD6AIFOCR.txt``（同名同后缀）
-``X_PD6AIFOCR_opt.pdf``                        ``X_PD6AIFOCR.txt``（``_opt`` 只在 PDF 上，TXT 里不要）
+``X_PD6AIFOCR.pdf`` / ``X_PD6AIOCR.pdf``       ``X_PD6AIFOCR.txt`` / ``X_PD6AIOCR.txt``（同名同后缀）
+``X_<任意后缀>_opt.pdf``                        ``X_<后缀>.txt``（**任何后缀后面都能再跟 ``_opt``**，``_opt`` 一律丢掉）
 ``X_全1册_PD6AIFOCR.pdf``                       ``X_全1册_PD6AIFOCR.txt``（``_全1册`` 保留）
 ``X_10117362_PD6AIOCR.pdf``                    ``X_10117362_PD6AIOCR.txt``（编号保留）
 ``X_扫描版_unlocked_PD6AIOCR.pdf``              ``X_扫描版_unlocked_PD6AIOCR.txt``
@@ -22,6 +22,9 @@
 ``_<版本>AI[F]OCR``（``_PD6AIFOCR`` / ``_PD6AIOCR`` / ``_PD5AIOCR`` / ``_PD5AIFOCR`` /
 ``_PD7AIOCR`` / ``_PD7AIFOCR`` / ``_PDVL6AIOCR`` / ``_PDVL6AIFOCR`` / ``_AIFOCR`` /
 ``_AIOCR`` / ``_FOCR`` / ``_OCR``，版本段可省略）。
+
+**任意标准后缀后面都能再跟一个 ``_opt``**（``_PD6AIOCR_opt``、``_PD6AIFOCR_opt``、``_FOCR_opt``、
+``_OCR_opt``、``_PDVL6AIFOCR_opt``、``_layered_opt`` …），``_opt`` 是 PDF 侧的后缀，生成 TXT 名时一律丢掉。
 """
 import re
 
