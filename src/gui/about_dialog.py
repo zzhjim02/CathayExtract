@@ -29,7 +29,7 @@ class AboutDialog(QDialog):
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         content_layout.addWidget(title)
 
-        version = QLabel("版本: v1.2.1")
+        version = QLabel("版本: v1.2.2")
         version.setStyleSheet("font-size: 14px; color: #7f8c8d;")
         version.setAlignment(Qt.AlignmentFlag.AlignCenter)
         content_layout.addWidget(version)
