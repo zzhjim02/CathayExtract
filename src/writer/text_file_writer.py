@@ -23,6 +23,7 @@ from typing import Optional
 
 from ..core.config import ExtractedText
 from ..core.exceptions import FileWriteError
+from ..core.output_naming import MODE_AUTO, NAME_MODES, txt_name_for_pdf
 from .directory_creator import DirectoryCreator
 
 #: 与 CathayOCR Pro 一致的分隔线
@@ -70,7 +71,11 @@ def format_result_txt(source_stem: str, extracted: ExtractedText,
 class TextFileWriter:
     """文本文件写入器"""
 
-    def __init__(self, output_dir: Path, overwrite: bool = False, formatted: bool = True):
+    #: 输出命名方式：auto=按源文件名后缀自动判定（默认）/ result=统一 原名_result.txt / same=与源文件同名
+    NAME_MODES = NAME_MODES
+
+    def __init__(self, output_dir: Path, overwrite: bool = False, formatted: bool = True,
+                 name_mode: str = MODE_AUTO):
         """
         初始化文件写入器
 
@@ -78,11 +83,23 @@ class TextFileWriter:
             output_dir: 输出目录
             overwrite: 是否覆盖已存在的文件
             formatted: 是否按 CathayOCR Pro 格式输出(有分页信息时生效)
+            name_mode: 输出命名方式（auto / result / same）
         """
         self.output_dir = Path(output_dir)
         self.overwrite = overwrite
         self.formatted = formatted
+        self.name_mode = name_mode if name_mode in NAME_MODES else MODE_AUTO
         self.directory_creator = DirectoryCreator(self.output_dir)
+
+    def output_name(self, stem: str) -> str:
+        """根据命名方式生成输出文件名（规则见 core.output_naming）
+
+        - auto:   末尾有标准后缀 → 同名同后缀（``_layered``→``_result``、``_opt`` 丢掉）；
+                  没有 → 补 ``_result``
+        - result: 统一 ``书名_result.txt``
+        - same:   与源 PDF 完全同名
+        """
+        return txt_name_for_pdf(stem, self.name_mode)
 
     def write(self, relative_path: Path, extracted_text: ExtractedText) -> Path:
         """
@@ -101,8 +118,8 @@ class TextFileWriter:
         # 创建目标目录结构
         target_dir = self.directory_creator.create_structure(relative_path)
 
-        # 生成输出文件名(保持原文件名,仅扩展名改为.txt)
-        output_filename = relative_path.stem + ".txt"
+        # 生成输出文件名(默认 原名_result.txt；可选与源文件同名)
+        output_filename = self.output_name(relative_path.stem)
         output_path = target_dir / output_filename
 
         # 检查文件是否已存在
@@ -132,10 +149,10 @@ class TextFileWriter:
         Returns:
             文件是否存在
         """
-        output_filename = relative_path.stem + ".txt"
+        output_filename = self.output_name(relative_path.stem)
         output_path = self.output_dir / relative_path.parent / output_filename
         return output_path.exists()
 
     def target_path(self, relative_path: Path) -> Path:
         """计算输出文件路径(不创建、不写入)"""
-        return self.output_dir / relative_path.parent / (relative_path.stem + ".txt")
+        return self.output_dir / relative_path.parent / self.output_name(relative_path.stem)
