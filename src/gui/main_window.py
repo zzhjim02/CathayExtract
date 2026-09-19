@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QLineEdit,
     QCheckBox,
+    QComboBox,
     QLabel,
     QMessageBox,
     QTabWidget,
@@ -25,6 +26,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 
 from ..core.config import ExtractorConfig
+from ..core.appsettings import load_settings, save_settings
 from ..coordinator import TaskCoordinator
 from .path_selector import PathSelector
 from .progress_widget import ProgressWidget
@@ -35,7 +37,7 @@ from .method_selector_widget import MethodSelectorWidget
 from .performance_stats_widget import PerformanceStatsWidget
 
 APP_TITLE = "CathayExtract · PDF OCR 文本提取器"
-APP_VERSION = "v1.2.1"
+APP_VERSION = "v1.2.2"
 
 
 class PendingListWidget(QListWidget):
@@ -159,9 +161,32 @@ class MainWindow(QMainWindow):
         # 输出目录选择（留空 = 原地输出）
         self.output_selector = PathSelector("输出目录:", mode="dir")
         self.output_selector.path_edit.setPlaceholderText(
-            "留空 = 输出到每个 PDF 的原目录（输出文件名 = 原文件名.txt）"
+            "留空 = 输出到每个 PDF 的原目录（TXT 文件名按下面「TXT 命名」规则）"
         )
         config_layout.addWidget(self.output_selector)
+
+        # TXT 命名方式（默认：按源文件名后缀自动判定）
+        name_layout = QHBoxLayout()
+        name_layout.addWidget(QLabel("TXT 命名:"))
+        self.name_mode_combo = QComboBox()
+        self.name_mode_combo.addItem("按源文件名自动判定（推荐）", "auto")
+        self.name_mode_combo.addItem("统一 原名_result.txt", "result")
+        self.name_mode_combo.addItem("与源文件名完全同名", "same")
+        self.name_mode_combo.setToolTip(
+            "自动判定规则（与 Cathay 工具链一致）：\n"
+            "  X_layered.pdf        → X_result.txt\n"
+            "  X_PD6AIFOCR_opt.pdf  → X_PD6AIFOCR.txt（_opt 丢掉）\n"
+            "  X_PD6AIFOCR.pdf      → X_PD6AIFOCR.txt（同名同后缀，_FOCR/_OCR 同理）\n"
+            "  X.pdf（无后缀）       → X_result.txt\n"
+            "  8 位编号 / _全1册 / _unlocked 等噪声不保留"
+        )
+        _saved_mode = load_settings().get("out_name_mode", "auto")
+        _idx = self.name_mode_combo.findData(_saved_mode)
+        if _idx >= 0:
+            self.name_mode_combo.setCurrentIndex(_idx)
+        name_layout.addWidget(self.name_mode_combo)
+        name_layout.addStretch(1)
+        config_layout.addLayout(name_layout)
 
         # 文件名过滤
         filter_layout = QHBoxLayout()
@@ -406,6 +431,8 @@ class MainWindow(QMainWindow):
                 raise ValueError(f"输出路径不是目录: {output_dir}")
 
         # 创建配置对象
+        name_mode = self.name_mode_combo.currentData() or "auto"
+        save_settings({"out_name_mode": name_mode})
         config = ExtractorConfig(
             source_dir=source_dir,
             output_dir=output_dir,
@@ -419,6 +446,7 @@ class MainWindow(QMainWindow):
             enable_performance_stats=self.method_selector_widget.is_performance_stats_enabled(),
             fallback_on_failure=self.method_selector_widget.is_fallback_enabled(),
             file_list=file_list,
+            out_name_mode=name_mode,
         )
 
         return config
