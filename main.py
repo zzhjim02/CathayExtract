@@ -3,7 +3,7 @@ import os
 import sys
 
 APP_TITLE = 'CathayExtract · PDF OCR 文本提取器'
-APP_VERSION = 'v1.2.0'
+APP_VERSION = 'v1.2.1'
 
 
 def app_dir():
@@ -53,6 +53,35 @@ def selftest():
         app.processEvents()
         out.append('主窗口=OK 标题=%s' % w.windowTitle())
         w.close()
+
+        # 新增能力自检：原地输出（输出到原目录、原文件名.txt）+ CathayOCR 格式
+        try:
+            import tempfile
+            import fitz
+            from pathlib import Path
+            from src.core.config import ExtractorConfig
+            from src.coordinator.task_coordinator import TaskCoordinator
+
+            d = Path(tempfile.mkdtemp(prefix='cathayextract_selftest_'))
+            pdf = d / '自检样张.pdf'
+            doc = fitz.open()
+            page = doc.new_page()
+            page.insert_text((72, 100), '自检文字', fontsize=14, fontname='china-s')
+            doc.save(str(pdf))
+            doc.close()
+
+            cfg = ExtractorConfig(source_dir=d, output_dir=None, overwrite=True,
+                                  skip_existing=True, use_multithreading=False,
+                                  file_list=[pdf])
+            TaskCoordinator(cfg).run()
+            txt = d / '自检样张.txt'
+            content = txt.read_text(encoding='utf-8') if txt.exists() else ''
+            out.append('原地输出=%s (文件名=%s)' % (txt.exists(), txt.name))
+            out.append('输出格式=(头=%s 分页=%s)' % (
+                content.startswith('OCR文本提取结果'), '第 1 页' in content))
+        except Exception as e:
+            out.append('输出自检=FAIL %s: %s' % (type(e).__name__, e))
+
         out.append('result=OK')
     except Exception as e:
         out.append('主窗口=FAIL %s: %s' % (type(e).__name__, e))

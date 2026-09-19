@@ -1,5 +1,6 @@
 """任务协调器实现"""
 from datetime import datetime
+from pathlib import Path
 from PyQt6.QtCore import QThread, QThreadPool, QRunnable, pyqtSignal, QObject
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
@@ -12,6 +13,29 @@ from ..writer import TextFileWriter
 from .error_handler import ErrorHandler
 
 
+class OutputWriterRouter:
+    """决定 TXT 写到哪里
+
+    - 配了输出目录：统一写到该目录（保持相对目录结构）
+    - 输出目录留空：写到每个源 PDF 旁边（原地输出），文件名 = 原文件名.txt
+    """
+
+    def __init__(self, config: ExtractorConfig):
+        self.config = config
+        self.in_place = config.output_dir is None
+        self._shared = None if self.in_place else TextFileWriter(config.output_dir, config.overwrite)
+
+    def writer_for(self, pdf_info) -> TextFileWriter:
+        """取该文件使用的写入器"""
+        if self.in_place:
+            return TextFileWriter(pdf_info.file_path.parent, self.config.overwrite)
+        return self._shared
+
+    def relative_for(self, pdf_info) -> Path:
+        """取该文件在输出侧的相对路径（原地输出时就是文件名本身）"""
+        return Path(pdf_info.file_path.name) if self.in_place else pdf_info.relative_path
+
+
 class WorkerSignals(QObject):
     """工作线程信号"""
     progress_updated = pyqtSignal(int, int, str)  # 当前进度,总数,当前文件路径
@@ -21,7 +45,7 @@ class WorkerSignals(QObject):
 class PDFProcessingTask(QRunnable):
     """PDF处理任务,用于多线程执行"""
 
-    def __init__(self, pdf_info, extractor, encoding_converter, writer, config, signals):
+    def __init__(self, pdf_info, extractor, encoding_converter, router, config, signals):
         """
         初始化PDF处理任务
 
@@ -29,7 +53,7 @@ class PDFProcessingTask(QRunnable):
             pdf_info: PDF文件信息
             extractor: PDF文本提取器
             encoding_converter: 编码转换器
-            writer: 文件写入器
+            router: 输出写入路由器
             config: 配置对象
             signals: 信号对象
         """
@@ -37,7 +61,7 @@ class PDFProcessingTask(QRunnable):
         self.pdf_info = pdf_info
         self.extractor = extractor
         self.encoding_converter = encoding_converter
-        self.writer = writer
+        self.router = router
         self.config = config
         self.signals = signals
         self.should_stop = False
@@ -59,11 +83,14 @@ class PDFProcessingTask(QRunnable):
                 self.signals.file_processed.emit(str(file_path), error_msg, False)
                 return
 
-            # 检查文件是否已处理(跳过已处理的文件)
+            writer = self.router.writer_for(self.pdf_info)
+            rel = self.router.relative_for(self.pdf_info)
+
+            # 不覆盖已存在的文件时，直接跳过（不算失败）
             if self.config.skip_existing and not self.config.overwrite:
-                if self.writer.exists(self.pdf_info.relative_path):
+                if writer.exists(rel):
                     self.result["skipped"] = True
-                    msg = "文件已存在,跳过"
+                    msg = "目标 TXT 已存在，跳过（未覆盖）"
                     self.signals.file_processed.emit(str(file_path), msg, True)
                     return
 
@@ -89,7 +116,7 @@ class PDFProcessingTask(QRunnable):
                     pass
 
             # 写入文件
-            output_path = self.writer.write(self.pdf_info.relative_path, extracted_text)
+            output_path = writer.write(rel, extracted_text)
             msg = f"提取成功 -> {output_path}"
             self.result["success"] = True
             self.signals.file_processed.emit(str(file_path), msg, True)
@@ -177,18 +204,18 @@ class TaskCoordinator(QThread):
                 return
 
             # 2. 处理PDF文件
-            writer = TextFileWriter(self.config.output_dir, self.config.overwrite)
+            router = OutputWriterRouter(self.config)
 
             if self.config.use_multithreading:
                 # 多线程处理
-                self._process_with_multithreading(pdf_files, writer, result)
+                self._process_with_multithreading(pdf_files, router, result)
             else:
                 # 单线程处理
-                self._process_single_thread(pdf_files, writer, result)
+                self._process_single_thread(pdf_files, router, result)
 
             # 3. 写入错误日志
             if self.error_handler.get_error_count() > 0:
-                self.error_handler.write_log_file(self.config.output_dir)
+                self.error_handler.write_log_file(self.config.output_dir or self.config.source_dir)
 
             # 4. 发送性能统计
             performance_summary = self.method_dispatcher.get_performance_summary()
@@ -214,13 +241,13 @@ class TaskCoordinator(QThread):
             self._is_running = False
             self.tasks.clear()
 
-    def _process_single_thread(self, pdf_files, writer: TextFileWriter, result: ProcessingResult):
+    def _process_single_thread(self, pdf_files, router: OutputWriterRouter, result: ProcessingResult):
         """
         单线程处理PDF文件
 
         Args:
             pdf_files: PDF文件列表
-            writer: 文件写入器
+            router: 输出写入路由器
             result: 处理结果对象
         """
         for idx, pdf_info in enumerate(pdf_files, 1):
@@ -232,7 +259,7 @@ class TaskCoordinator(QThread):
             self.progress_updated.emit(idx, result.total_files, str(pdf_info.file_path))
 
             # 处理文件
-            task_result = self._process_single_file(pdf_info, writer, result)
+            task_result = self._process_single_file(pdf_info, router, result)
 
             if task_result["success"]:
                 result.success_count += 1
@@ -241,13 +268,13 @@ class TaskCoordinator(QThread):
             else:
                 result.failed_count += 1
 
-    def _process_with_multithreading(self, pdf_files, writer: TextFileWriter, result: ProcessingResult):
+    def _process_with_multithreading(self, pdf_files, router: OutputWriterRouter, result: ProcessingResult):
         """
         多线程处理PDF文件
 
         Args:
             pdf_files: PDF文件列表
-            writer: 文件写入器
+            router: 输出写入路由器
             result: 处理结果对象
         """
         # 确定线程数
@@ -267,7 +294,7 @@ class TaskCoordinator(QThread):
                     pdf_info,
                     self.extractor,
                     self.encoding_converter,
-                    writer,
+                    router,
                     self.config,
                     self.worker_signals
                 )
@@ -313,13 +340,13 @@ class TaskCoordinator(QThread):
                         str(e)
                     )
 
-    def _process_single_file(self, pdf_info, writer: TextFileWriter, result: ProcessingResult) -> dict:
+    def _process_single_file(self, pdf_info, router: OutputWriterRouter, result: ProcessingResult) -> dict:
         """
         处理单个PDF文件(单线程版本)
 
         Args:
             pdf_info: PDF文件信息
-            writer: 文件写入器
+            router: 输出写入路由器
             result: 处理结果对象
 
         Returns:
@@ -335,10 +362,13 @@ class TaskCoordinator(QThread):
                 self.file_processed.emit(str(file_path), error_msg, False)
                 return {"success": False, "skipped": False, "error": error_msg}
 
-            # 检查文件是否已处理(跳过已处理的文件)
+            writer = router.writer_for(pdf_info)
+            rel = router.relative_for(pdf_info)
+
+            # 不覆盖已存在的文件时，直接跳过（不算失败）
             if self.config.skip_existing and not self.config.overwrite:
-                if writer.exists(pdf_info.relative_path):
-                    msg = "文件已存在,跳过"
+                if writer.exists(rel):
+                    msg = "目标 TXT 已存在，跳过（未覆盖）"
                     self.file_processed.emit(str(file_path), msg, True)
                     return {"success": False, "skipped": True, "error": None}
 
@@ -364,7 +394,7 @@ class TaskCoordinator(QThread):
                     pass
 
             # 写入文件
-            output_path = writer.write(pdf_info.relative_path, extracted_text)
+            output_path = writer.write(rel, extracted_text)
             msg = f"提取成功 -> {output_path}"
             self.file_processed.emit(str(file_path), msg, True)
 

@@ -29,7 +29,7 @@ class AboutDialog(QDialog):
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         content_layout.addWidget(title)
 
-        version = QLabel("版本: v1.2.0")
+        version = QLabel("版本: v1.2.1")
         version.setStyleSheet("font-size: 14px; color: #7f8c8d;")
         version.setAlignment(Qt.AlignmentFlag.AlignCenter)
         content_layout.addWidget(version)
@@ -41,12 +41,17 @@ class AboutDialog(QDialog):
             "一个专业的PDF OCR文本提取工具,支持批量处理、多线程并行、智能跳过等功能。"
             "\n\n"
             "主要功能:"
+            "\n• 直接拖入 PDF 文件或整个文件夹"
+            "\n• 待处理列表可单独移除某个文件"
+            "\n• 输出目录留空 = 输出到原目录（文件名 = 原文件名.txt）"
+            "\n• 输出格式与 CathayOCR Pro 一致（含分页标记）"
             "\n• 递归扫描文件夹中的所有PDF文件"
             "\n• 提取PDF文件中的OCR文本层内容"
             "\n• 保持原有的文件名和目录结构"
             "\n• 支持文件名过滤(通配符匹配)"
             "\n• 多线程并行处理,大幅提升速度"
             "\n• 智能跳过已处理文件,避免重复工作"
+            "\n• 不覆盖已存在的文件时自动跳过"
             "\n• 多种提取方法支持(PYMUPDF/PDFPLUMBER/PyPDF2)"
             "\n• 智能方法选择,自动选择最优方法"
             "\n• 性能统计,实时监控处理性能"

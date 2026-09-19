@@ -102,7 +102,7 @@ class ExtractorConfig:
     """提取器配置类"""
 
     source_dir: Path  # 源目录路径
-    output_dir: Path  # 输出目录路径
+    output_dir: Optional[Path] = None  # 输出目录；None/留空 = 输出到每个源文件所在目录(原地)
     file_pattern: str = "*"  # 文件名过滤模式,支持通配符
     overwrite: bool = False  # 是否覆盖已存在的文件
     verbose: bool = True  # 是否显示详细日志
@@ -112,13 +112,26 @@ class ExtractorConfig:
     method_selection_mode: MethodSelectionMode = MethodSelectionMode.AUTO  # 方法选择模式
     enable_performance_stats: bool = True  # 是否启用性能统计
     fallback_on_failure: bool = True  # 失败时是否自动降级
+    file_list: Optional[List[Path]] = None  # 显式待处理清单(拖入的文件/预扫描结果);为空则按源目录扫描
 
     def __post_init__(self):
         """验证配置参数"""
         if not isinstance(self.source_dir, Path):
             self.source_dir = Path(self.source_dir)
-        if not isinstance(self.output_dir, Path):
+        # 输出目录:留空 / None 表示原地输出（写到每个源文件所在目录）
+        if self.output_dir is None or not str(self.output_dir).strip():
+            self.output_dir = None
+        elif not isinstance(self.output_dir, Path):
             self.output_dir = Path(self.output_dir)
+        if self.file_list:
+            self.file_list = [Path(p) for p in self.file_list]
+        else:
+            self.file_list = None
+
+    @property
+    def in_place(self) -> bool:
+        """是否原地输出（TXT 写在源 PDF 旁边）"""
+        return self.output_dir is None
 
 
 @dataclass
@@ -140,6 +153,7 @@ class ExtractedText:
     encoding: str = "utf-8"  # 文本编码
     page_count: int = 0  # PDF页数
     has_text: bool = True  # 是否包含文本
+    page_texts: List[str] = field(default_factory=list)  # 逐页原始文本(用于按 CathayOCR Pro 格式输出)
 
 
 @dataclass

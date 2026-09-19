@@ -23,9 +23,14 @@ class DirectoryScanner:
         """
         扫描目录,返回所有PDF文件信息
 
+        若配置里带显式待处理清单(拖入的文件/文件夹),优先使用该清单。
+
         Returns:
             PDFFileInfo列表
         """
+        if self.config.file_list:
+            return self.scan_paths(self.config.file_list)
+
         if not self.config.source_dir.exists():
             raise FileNotFoundError(f"源目录不存在: {self.config.source_dir}")
 
@@ -37,6 +42,38 @@ class DirectoryScanner:
             if self._matches_pattern(pdf_info.file_path.name):
                 pdf_files.append(pdf_info)
 
+        return pdf_files
+
+    def scan_paths(self, paths) -> List[PDFFileInfo]:
+        """
+        扫描「拖入的文件 / 文件夹」混合列表
+
+        - 文件夹：递归取其下的 PDF（受 file_pattern 过滤）
+        - 文件：只要是 .pdf 就直接收（不受过滤影响）
+
+        Args:
+            paths: 路径列表（Path 或字符串，可混排）
+
+        Returns:
+            PDFFileInfo列表
+        """
+        pdf_files = []
+        seen = set()
+        for raw in paths:
+            path = Path(raw)
+            if path.is_dir():
+                for item in sorted(path.rglob("*.pdf")):
+                    if not item.is_file() or item in seen:
+                        continue
+                    if not self._matches_pattern(item.name):
+                        continue
+                    seen.add(item)
+                    pdf_files.append(self._create_pdf_info(item, base=path))
+            elif path.is_file() and path.suffix.lower() == ".pdf":
+                if path in seen:
+                    continue
+                seen.add(path)
+                pdf_files.append(self._create_pdf_info(path))
         return pdf_files
 
     def _scan_recursive(self) -> Generator[PDFFileInfo, None, None]:
@@ -69,18 +106,23 @@ class DirectoryScanner:
         except PermissionError:
             raise PermissionError(f"无权限访问目录: {self.config.source_dir}")
 
-    def _create_pdf_info(self, file_path: Path) -> PDFFileInfo:
+    def _create_pdf_info(self, file_path: Path, base: Path = None) -> PDFFileInfo:
         """
         创建PDF文件信息
 
         Args:
             file_path: PDF文件路径
+            base: 相对路径的基准目录（默认源目录；不在基准下时只用文件名）
 
         Returns:
             PDFFileInfo对象
         """
+        base = Path(base) if base is not None else self.config.source_dir
         try:
-            relative_path = file_path.relative_to(self.config.source_dir)
+            try:
+                relative_path = file_path.relative_to(base)
+            except ValueError:
+                relative_path = Path(file_path.name)
             file_size = file_path.stat().st_size
 
             if file_size == 0:

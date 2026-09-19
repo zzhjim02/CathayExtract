@@ -48,12 +48,16 @@ class PyMuPDFStrategy(ExtractionStrategy):
             doc = fitz.open(pdf_path)
             page_count = len(doc)
             text_parts = []
+            page_texts = []
 
             for page_num in range(page_count):
                 page = doc[page_num]
                 text = page.get_text()
                 if text and text.strip():
                     text_parts.append(f"=== 第 {page_num + 1} 页 ===\n{text}\n")
+                    page_texts.append(text)
+                else:
+                    page_texts.append("")
 
             doc.close()
 
@@ -61,7 +65,8 @@ class PyMuPDFStrategy(ExtractionStrategy):
             return ExtractedText(
                 text=full_text,
                 page_count=page_count,
-                has_text=bool(text_parts)
+                has_text=bool(text_parts),
+                page_texts=page_texts,
             )
 
         except Exception as e:

@@ -46,6 +46,7 @@ class PDFPlumberStrategy(ExtractionStrategy):
 
         try:
             text_parts = []
+            page_texts = []
             page_count = 0
 
             with pdfplumber.open(pdf_path) as pdf:
@@ -56,15 +57,19 @@ class PDFPlumberStrategy(ExtractionStrategy):
                         page_text = page.extract_text()
                         if page_text and page_text.strip():
                             text_parts.append(f"=== 第 {page_num} 页 ===\n{page_text}\n")
+                            page_texts.append(page_text)
+                        else:
+                            page_texts.append("")
                     except Exception:
                         # 跳过无法提取的页面
+                        page_texts.append("")
                         continue
 
             if not text_parts:
-                return ExtractedText(text="", page_count=page_count, has_text=False)
+                return ExtractedText(text="", page_count=page_count, has_text=False, page_texts=page_texts)
 
             full_text = "\n".join(text_parts)
-            return ExtractedText(text=full_text, page_count=page_count, has_text=True)
+            return ExtractedText(text=full_text, page_count=page_count, has_text=True, page_texts=page_texts)
 
         except Exception as e:
             raise PDFExtractionError(f"PDFPLUMBER提取失败: {e}")

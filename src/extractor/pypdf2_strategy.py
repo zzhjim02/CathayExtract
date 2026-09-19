@@ -48,21 +48,26 @@ class PyPDF2Strategy(ExtractionStrategy):
             reader = PyPDF2.PdfReader(pdf_path)
             page_count = len(reader.pages)
             text_parts = []
+            page_texts = []
 
             for page_num, page in enumerate(reader.pages, 1):
                 try:
                     page_text = page.extract_text()
                     if page_text and page_text.strip():
                         text_parts.append(f"=== 第 {page_num} 页 ===\n{page_text}\n")
+                        page_texts.append(page_text)
+                    else:
+                        page_texts.append("")
                 except Exception:
                     # 跳过无法提取的页面
+                    page_texts.append("")
                     continue
 
             if not text_parts:
-                return ExtractedText(text="", page_count=page_count, has_text=False)
+                return ExtractedText(text="", page_count=page_count, has_text=False, page_texts=page_texts)
 
             full_text = "\n".join(text_parts)
-            return ExtractedText(text=full_text, page_count=page_count, has_text=True)
+            return ExtractedText(text=full_text, page_count=page_count, has_text=True, page_texts=page_texts)
 
         except PyPDF2.PdfReadError as e:
             raise PDFExtractionError(f"PDF文件损坏或格式错误: {e}")
