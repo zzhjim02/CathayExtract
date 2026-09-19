@@ -93,9 +93,9 @@ TXT 默认就写在原 PDF 旁边，名字**沿用源文件的后缀**（`书_PD
 |:----|:----|
 | `X_layered.pdf` | `X_result.txt`（固定配对：`_layered.pdf ↔ _result.txt`） |
 | `X_PD6AIFOCR_opt.pdf` | `X_PD6AIFOCR.txt`（`_opt` 丢掉） |
-| `X_PD6AIFOCR.pdf`（`_PD5AIFOCR` / `_PDVL6AIFOCR` / `_PD6AIOCR` / `_AIFOCR` / `_FOCR` / `_OCR` 等同理） | `X_PD6AIFOCR.txt`（**同名同后缀**） |
+| `X_PD6AIFOCR.pdf`（版本段 `PD5` / `PD6` / `PD7` / `PDVL6` × 繁简 `AIFOCR` / `AIOCR` 的**所有组合**，如 `_PD5AIOCR`、`_PD5AIFOCR`、`_PDVL6AIOCR`、`_PDVL6AIFOCR`、`_PD7AIOCR`、`_PD7AIFOCR`；以及无版本 `_AIFOCR` / `_AIOCR` / `_FOCR` / `_OCR`） | `X_PD6AIFOCR.txt`（**同名同后缀**） |
 | `X_全1册_PD6AIFOCR.pdf`、`X_10117362_PD6AIOCR.pdf`、`X_..._unlocked_PD6AIOCR.pdf` | 噪声不保留（8 位编号 / `_全1册` / `_unlocked` / `扫描版` 等）：`X_PD6AIFOCR.txt` |
-| `X_PD6AIFOCR_【繁转简】.pdf` | `X_PD6AIFOCR_【繁转简】.txt`（繁简尾巴原样保留） |
+| `X_PD6AIFOCR_【繁转简】.pdf` | `X_PD6AIFOCR_【繁转简】.txt`（**PDF 一般不带这个尾巴**，它是 TXT 侧的后缀；真带了则原样保留） |
 | `X.pdf`（没有任何标准后缀） | `X_result.txt` |
 
   > 这样导出的 TXT 与 [CathayOCR](https://github.com/zzhjim02/CathayOCR) / [CathayShelf](https://github.com/zzhjim02/CathayShelf) / [CathayRestore](https://github.com/zzhjim02/CathayRestore) 的后缀约定完全一致，**不用再转换**就能被工具链直接识别。
