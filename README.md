@@ -14,7 +14,8 @@
 **已有双层 PDF（里面带 OCR 文字层）→ 一本一个 TXT，输出格式与 CathayOCR Pro 一致。**
 
 不必重跑 OCR，也不必安装 Python：**把文件或文件夹拖进窗口**，点一下「开始提取」就行——
-TXT 默认就写在原 PDF 旁边（`书.pdf → 书.txt`）。
+TXT 默认就写在原 PDF 旁边，名字**沿用源文件的后缀**（`书_PD6AIFOCR.pdf → 书_PD6AIFOCR.txt`，
+`书_layered.pdf → 书_result.txt`，没有后缀则 `书_result.txt`）。
 
 </div>
 
@@ -31,7 +32,7 @@ TXT 默认就写在原 PDF 旁边（`书.pdf → 书.txt`）。
 | ③ | [**CathaySimplify** →](https://github.com/zzhjim02/CathaySimplify) | 🔄 TXT 繁简体批量双向转换 · 编码智能适配 | ✅ v1.0.0 |
 | ④ | [**CathayShelf** →](https://github.com/zzhjim02/CathayShelf) | 🗂️ 图书著录建夹 · 后缀替换 · 繁简转换+编码规范化 | ✅ v0.4.3 |
 | ⑤ | [**CathayReader** →](https://github.com/zzhjim02/CathayReader) | 📖 PDF/TXT 双栏同步古籍校勘阅读器 | ✅ v1.0.0 |
-| ✳ | **⭐ CathayExtract（你在这里）** | 🔎 **已有双层 PDF → 提取文字层成 TXT** | 🆕 **v1.2.1** |
+| ✳ | **⭐ CathayExtract（你在这里）** | 🔎 **已有双层 PDF → 提取文字层成 TXT** | 🆕 **v1.2.2** |
 
 </div>
 
@@ -51,7 +52,7 @@ TXT 默认就写在原 PDF 旁边（`书.pdf → 书.txt`）。
 
 - **拖入即用**：直接把 **PDF 文件 / 整个文件夹**拖进窗口（文件夹会递归展开成待处理列表）
 - **待处理列表**：所见即所得，可**单独把某个文件移出列表**（多选、清空都支持）
-- **输出到原目录（默认）**：输出目录留空 = TXT 写在每个 PDF 旁边，文件名 = `原文件名.txt`
+- **输出到原目录（默认）**：输出目录留空 = TXT 写在每个 PDF 旁边，文件名**按源文件名后缀自动判定**（见下方「输出规则」）
 - **输出格式与 CathayOCR Pro 一致**：抬头（源文件 / 总页数 / 渲染倍数 / 提取时间）+ `第 N 页` 分页块
 - **递归扫描**：自动扫描所选文件夹及其所有子文件夹
 - **保持目录结构**：指定输出目录时，TXT 的相对路径与来源 PDF 一一对应
@@ -69,7 +70,7 @@ TXT 默认就写在原 PDF 旁边（`书.pdf → 书.txt`）。
 1. 双击 **`启动.bat`**（便携版自带运行时；也会自动回退到系统 Python）
 2. **把 PDF 或文件夹拖进窗口**（或用「添加文件 / 添加文件夹」按钮）——列表里就是待处理文件，
    不想要哪本就选中它点「**移除选中**」
-3. **输出目录留空**即可（默认写到每个 PDF 的原目录，文件名 = `原文件名.txt`）；
+3. **输出目录留空**即可（默认写到每个 PDF 的原目录，文件名按源文件名后缀自动判定）；
    想集中存放再选一个输出目录
 4. （可选）填**文件名过滤**、设**线程数**、决定是否**覆盖已存在的文件**
 5. 点 **开始提取**，等进度条走完，去结果标签页看统计
@@ -86,8 +87,19 @@ TXT 默认就写在原 PDF 旁边（`书.pdf → 书.txt`）。
 
 ## 📂 输出规则（重要）
 
-- 输出 **TXT** 用 **UTF-8** 保存；文件名与来源 PDF 同名（`书.pdf → 书.txt`）
-- **输出目录留空 = 原地输出**：TXT 直接写在每个 PDF 所在目录；指定了输出目录则目录结构照搬（`A/B/书.pdf → 输出根/A/B/书.txt`）
+- 输出 **TXT** 用 **UTF-8** 保存；文件名按**源文件名的后缀**自动判定（界面里「TXT 命名」默认就是这个规则，也可强制改成统一 `_result` 或与源文件完全同名）：
+
+| 源 PDF 名 | 导出的 TXT |
+|:----|:----|
+| `X_layered.pdf` | `X_result.txt`（固定配对：`_layered.pdf ↔ _result.txt`） |
+| `X_PD6AIFOCR_opt.pdf` | `X_PD6AIFOCR.txt`（`_opt` 丢掉） |
+| `X_PD6AIFOCR.pdf`（`_PD5AIFOCR` / `_PDVL6AIFOCR` / `_PD6AIOCR` / `_AIFOCR` / `_FOCR` / `_OCR` 等同理） | `X_PD6AIFOCR.txt`（**同名同后缀**） |
+| `X_全1册_PD6AIFOCR.pdf`、`X_10117362_PD6AIOCR.pdf`、`X_..._unlocked_PD6AIOCR.pdf` | 噪声不保留（8 位编号 / `_全1册` / `_unlocked` / `扫描版` 等）：`X_PD6AIFOCR.txt` |
+| `X_PD6AIFOCR_【繁转简】.pdf` | `X_PD6AIFOCR_【繁转简】.txt`（繁简尾巴原样保留） |
+| `X.pdf`（没有任何标准后缀） | `X_result.txt` |
+
+  > 这样导出的 TXT 与 [CathayOCR](https://github.com/zzhjim02/CathayOCR) / [CathayShelf](https://github.com/zzhjim02/CathayShelf) / [CathayRestore](https://github.com/zzhjim02/CathayRestore) 的后缀约定完全一致，**不用再转换**就能被工具链直接识别。
+- **输出目录留空 = 原地输出**：TXT 直接写在每个 PDF 所在目录；指定了输出目录则目录结构照搬（`A/B/书.pdf → 输出根/A/B/书_PD6AIFOCR.txt`）
 - **输出格式与 [CathayOCR Pro](https://github.com/zzhjim02/CathayOCR) 默认导出一致**：
 
 ```
@@ -116,7 +128,7 @@ OCR文本提取结果
 | 下载方式 | 链接 |
 |:-------|:-----|
 | 📥 **百度网盘**（密码 2026） | <待填：百度网盘分享链接> |
-| 🐙 **GitHub Releases** | [CathayExtract v1.2.1](https://github.com/zzhjim02/CathayExtract/releases/tag/v1.2.1)（Assets 里直接下 `CathayExtract.exe`） |
+| 🐙 **GitHub Releases** | [CathayExtract v1.2.2](https://github.com/zzhjim02/CathayExtract/releases/tag/v1.2.2)（Assets 里直接下 `CathayExtract.exe`） |
 | 🧰 **便携版（本仓库源码 + runtime）** | 解压后双击 `启动.bat`（自带 `runtime\`） |
 
 ## 🖥️ 系统要求
@@ -152,7 +164,7 @@ CathayExtract-DEV\
 │   ├── scanner\             # 目录递归扫描
 │   ├── writer\              # TXT 写出（CathayOCR 同款格式）、目录创建
 │   ├── coordinator\         # 任务调度、错误处理
-│   └── core\                # 配置、异常
+├── core\                # 配置、异常、输出命名规则（output_naming.py）、设置持久化
 ├── docs\                    # 用户手册 / 多线程说明 / 故障排查
 ├── tests\                   # 单元测试
 ├── app.ico                  # 图标
@@ -191,13 +203,15 @@ CathayExtract-DEV\
 <details>
 <summary>TXT 写到哪了？</summary>
 
-**输出目录留空**时，TXT 就写在与 PDF **同一个文件夹**里，名字是 `原文件名.txt`。
-例如 `D:\书\甲书.pdf` → `D:\书\甲书.txt`。指定了输出目录则写到那里（目录结构照搬）。
+**输出目录留空**时，TXT 就写在与 PDF **同一个文件夹**里，名字按源文件名后缀自动判定：
+`甲书_PD6AIFOCR.pdf → 甲书_PD6AIFOCR.txt`、`甲书_layered.pdf → 甲书_result.txt`、`甲书.pdf → 甲书_result.txt`。
+指定了输出目录则写到那里（目录结构照搬）。
 </details>
 
 ## 📝 更新日志
 
-- **v1.2.1**：**支持拖入文件与文件夹**；新增**待处理列表**（可单独移除某个文件）；**输出目录默认留空 = 输出到原目录**，输出文件名 = `原文件名.txt`；**导出格式对齐 CathayOCR Pro**（抬头 + `第 N 页` 分页）；不覆盖已存在的 TXT 时**自动跳过**；自检新增「原地输出 + 格式」检查
+- **v1.2.2**：**TXT 命名改为「按源文件名后缀自动判定」**——末尾有标准后缀（`_layered` / `_result` / `_PD6AIFOCR` / `_PD6AIOCR` / `_PD5AIFOCR` / `_PDVL6AIFOCR` / `_AIFOCR` / `_FOCR` / `_OCR` …）就**同名同后缀**导出（`_layered.pdf → _result.txt`、`_opt` 丢掉），没有后缀则导出 `书名_result.txt`；文件名里的噪声（8 位编号 / `_全1册` / `_unlocked` / `扫描版` 等）不再保留；繁简尾巴 `_【繁转简】` 原样保留。界面新增「**TXT 命名**」下拉（自动 / 统一 `_result` / 与源文件同名），选择会被记住
+- **v1.2.1**：**支持拖入文件与文件夹**；新增**待处理列表**（可单独移除某个文件）；**输出目录默认留空 = 输出到原目录**；**导出格式对齐 CathayOCR Pro**（抬头 + `第 N 页` 分页）；不覆盖已存在的 TXT 时**自动跳过**；自检新增「原地输出 + 格式」检查
 - **v1.2.0**：加入提取方法选择与性能统计、自动降级；更名 **CathayExtract** 并入 Cathay 工具链，许可由 MIT 调整为 **GPL-3.0**；加入便携运行时与 `启动.bat`、图标、`--selftest` 自检
 - **v1.1.0**：多线程并行、智能跳过已处理文件、UI 调整
 - **v1.0.0**：首版（PyMuPDF / pdfplumber / PyPDF2 三种提取方式，递归扫描，保持目录结构）
