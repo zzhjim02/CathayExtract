@@ -142,7 +142,7 @@ OCR文本提取结果
 
 | 下载方式 | 链接 |
 |:-------|:-----|
-| 📥 **百度网盘**（密码 2026） | <待填：百度网盘分享链接> |
+| 📥 **百度网盘**（密码 2026） | [CathayExtract 安装包](https://pan.baidu.com/s/18lzLknW_NIwzvGSM8iN8NQ?pwd=2026) |
 | 🐙 **GitHub Releases** | [CathayExtract v1.2.3](https://github.com/zzhjim02/CathayExtract/releases/tag/v1.2.3)（Assets 里直接下 `CathayExtract.exe`） |
 | 🧰 **便携版（本仓库源码 + runtime）** | 解压后双击 `启动.bat`（自带 `runtime\`） |
 
